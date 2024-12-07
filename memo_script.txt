@@ -1,0 +1,19 @@
+python basicsr/demo.py -opt options/test/SIDD/NAFNet-width64.yml --input_path ./demo/noisy.png --output_path ./demo/denoise_img.png
+python basicsr/demo.py -opt options/test/SIDD/NAFNet-width64.yml --input_path ./ys_train_set/train_noise/0.png --output_path ./ys_train_set/train_denoise/0.png
+
+
+python scripts/data_preparation/sidd.py
+python scripts/data_preparation/ys.py
+python scripts/data_preparation/ys_val.py
+python scripts/data_preparation/ys_test.py
+
+
+
+
+python -m torch.distributed.launch --nproc_per_node=1 --master_port=4321 basicsr/train.py -opt options/train/YS/NAFNet-width64.yml --launcher pytorch
+python -m torch.distributed.launch --nproc_per_node=1 --master_port=4321 basicsr/test.py -opt ./options/test/YS/NAFNet-width64.yml --launcher pytorch
+
+
+
+python basicsr/demo.py -opt options/test/YS/NAFNet-width64.yml --input_path ./datasets/YS/test_noise/0.png --output_path ./datasets/YS/test_denoise/0.png
+python basicsr/predict_ys.py -opt options/test/YS/NAFNet-width64.yml --input_path ./datasets/YS/test_noise --output_path ./datasets/YS/test_denoise
